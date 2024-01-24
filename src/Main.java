@@ -11,11 +11,12 @@ public class Main {
 
         List<Integer> buffer = new ArrayList<>();
 
-        Semaphore leftFork = new Semaphore(1);
-        Semaphore rightFork = new Semaphore(1);
+        Semaphore leftFork = new Semaphore(2);
+        Semaphore rightFork = new Semaphore(2);
 
+        System.out.println("Os filosofos estão na mesa!");
         for (int i = 0; i < filosophers; i++) {
-            Thread thread = new Filosofer(i, leftFork, rightFork, buffer);
+            Thread thread = new Filosopher(i, leftFork, rightFork, buffer);
             thread.start();
         }
     }
