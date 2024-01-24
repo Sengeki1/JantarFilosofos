@@ -1,3 +1,4 @@
+import java.util.List;
 import java.util.Random;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
@@ -6,18 +7,20 @@ public class Filosofer extends Thread{
     private int id_filosofer;
     private Semaphore leftFork;
     private Semaphore rightFork;
+    private List<Integer> buffer;
 
-    public Filosofer(int id_filosofer, Semaphore leftFork, Semaphore rightFork) {
+    public Filosofer(int id_filosofer, Semaphore leftFork, Semaphore rightFork, List<Integer> buffer) {
         this.id_filosofer = id_filosofer;
         this.leftFork = leftFork;
         this.rightFork = rightFork;
+        this.buffer = buffer;
     }
 
     @Override
     public void run() {
         Random rand = new Random(); // random integer
         try {
-            while(true) {
+            while(buffer.size() < 10) {
                 think();
                 leftFork.acquire(); // threads acquires the lock
                 boolean gotRightFork = rightFork.tryAcquire(500, TimeUnit.MILLISECONDS); // try to acquire the rightFork lock, returns a boolean
@@ -25,6 +28,7 @@ public class Filosofer extends Thread{
                     eat(); // if the threads has access to the lock it runs this block of code and release its resources
                     rightFork.release();
                     leftFork.release();
+                    buffer.add(1);
                 } else {
                     leftFork.release(); // if the thread couldn't get the lock since another thread already has the rightFork lock
                     // it releases its leftFork so when a thread release the resource rightFork, the thread that was on queue is able to
